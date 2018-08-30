@@ -1,5 +1,7 @@
 package org.ldevos77.azlant.model;
 
+import java.time.LocalDateTime;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -8,20 +10,25 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-/*
+/**
  * Line of financial portfolio.
  * 
  * ---------------
  * PortfolioLine
  * ---------------
- * id
+ * portfolio
+ * asset
  * quantity
  * purchasePrice
- * portfolio
+ * tradingFees
  * ---------------
+ * 
+ * @author Ludovic Devos
  */
 @Entity
 public class PortfolioLine {
@@ -32,7 +39,7 @@ public class PortfolioLine {
 	
 	@ManyToOne
 	@JoinColumn(name = "portfolio_id")
-	@JsonBackReference
+	@JsonIgnore
 	private Portfolio portfolio;
 	
 	@OneToOne
@@ -46,6 +53,63 @@ public class PortfolioLine {
 	
 	@Column(name="trading_fees")
 	private float tradingFees;
+	
+	/**
+	 * Creation date is technical field.
+	 * It's update only one time : when the record is created.
+	 */
+	private LocalDateTime creationDate;
+	
+	/**
+	 * Modification date is technical field.
+	 * It's updated each time the record is updated.
+	 */
+	private LocalDateTime modificationDate;
+	
+	/**
+	 * Private constructor, not for direct instantiation.
+	 * Needed for JPA.
+	 */
+	protected PortfolioLine() {}
+	
+	/**
+	 * Portfolio constructor
+	 * 
+	 * @param portfolio : must not be null
+	 * @param asset : must not be null
+	 * @param quantity : must be higher than zero
+	 * @param purchasePrice : must be higher or equal than zero
+	 * @param tradingFees : must be higher or equal than zero
+	 * @throws IllegalArgumentException if portfolio is null, or asset is null, or quantity <= 0,
+	 * 		or purchasePrice < 0, or tradingFees < 0.
+	 */
+	public PortfolioLine(Portfolio portfolio, Asset asset, int quantity, 
+			float purchasePrice, float tradingFees) {
+		
+		if (portfolio != null && asset != null && quantity > 0 && purchasePrice >= 0 && tradingFees >=0) {
+			this.portfolio = portfolio;
+			this.asset = asset;
+			this.quantity = quantity;
+			this.purchasePrice = purchasePrice;
+			this.tradingFees = tradingFees;
+		}
+		else {
+			throw new IllegalArgumentException();
+		}
+		
+	}
+	
+	@PreUpdate
+    private void setModificationDate() {
+		this.setModificationDate(LocalDateTime.now());
+	}
+	
+    @PrePersist
+    private void setCreationDate() {
+    	LocalDateTime localDateTime = LocalDateTime.now();
+    	this.setCreationDate(localDateTime);
+    	this.setModificationDate(localDateTime);
+	}
 
 	public long getId() {
 		return id;
@@ -93,6 +157,22 @@ public class PortfolioLine {
 
 	public void setAsset(Asset asset) {
 		this.asset = asset;
+	}
+
+	public LocalDateTime getCreationDate() {
+		return creationDate;
+	}
+
+	public void setCreationDate(LocalDateTime creationDate) {
+		this.creationDate = creationDate;
+	}
+
+	public LocalDateTime getModificationDate() {
+		return modificationDate;
+	}
+
+	public void setModificationDate(LocalDateTime modificationDate) {
+		this.modificationDate = modificationDate;
 	}
 
 }

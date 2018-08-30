@@ -6,7 +6,7 @@
 	<groupId>org.ldevos77</groupId>
 	<artifactId>azlant</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>jar</packaging>
+	<packaging>war</packaging>
 
 	<name>Azlant2</name>
 	<description>Project for financial portfolio</description>

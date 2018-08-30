@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 public class PortfolioNotFoundException extends RuntimeException {
 
 	/**
-	 * 
+	 * generated serial version ID (compiler-generated ID)
 	 */
 	private static final long serialVersionUID = 7016617710214577634L;
 
