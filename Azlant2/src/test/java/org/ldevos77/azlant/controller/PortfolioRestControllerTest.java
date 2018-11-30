@@ -6,10 +6,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.nio.charset.Charset;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ldevos77.azlant.exception.AssetNotFoundException;
+import org.ldevos77.azlant.model.Asset;
 import org.ldevos77.azlant.model.Portfolio;
 import org.ldevos77.azlant.model.PortfolioLine;
 import org.ldevos77.azlant.repository.AssetRepository;
@@ -37,13 +37,17 @@ public class PortfolioRestControllerTest {
 	@Autowired
     private MockMvc mockMvc;
 	
-	@Autowired
-	private AssetRepository assetRepository;
-	
 	private MediaType contentType = new MediaType(
 											MediaType.APPLICATION_JSON.getType(),
 											MediaType.APPLICATION_JSON.getSubtype(),
 											Charset.forName("utf8"));
+	/**
+	 * Dummy portfolio used as source of some Unit tests
+	 */
+	private Portfolio portfolio = new Portfolio("Unit Test");
+	
+	@Autowired
+	private AssetRepository assetRepository;
 	
 	/**
 	 * Check if the application return a HHTP status equal to 200 (OK) if
@@ -78,27 +82,6 @@ public class PortfolioRestControllerTest {
 	 */
     @Test
     public void saveNonExistingEmptyPortfolio() throws Exception {
-    	Portfolio portfolio = new Portfolio("Unit Test");
-    	    	
-    	this.mockMvc.perform(post("/portfolios/")
-                .contentType(contentType)
-                .content(convertToJson(portfolio)))
-                .andExpect(status().isCreated());
-    }
-    
-    /**
-	 * Check if the application return a HTTP status equal to 201 (Created) if
-	 * a new portfolio is created
-	 */
-    @Ignore("In a logic of micro services, create a portfolio with his lines "
-    		+ "are not supported anymore.")
-    @Test
-    public void saveNonExistingPortfolio() throws Exception {
-    	Portfolio portfolio = new Portfolio("Unit test 2");
-    	portfolio.addLine(new PortfolioLine(portfolio, assetRepository.findById((long) 1).orElseThrow(() -> new AssetNotFoundException()), 1, 0, 0));
-    	portfolio.addLine(new PortfolioLine(portfolio, assetRepository.findById((long) 2).orElseThrow(() -> new AssetNotFoundException()), 1, 0, 0));
-    	portfolio.addLine(new PortfolioLine(portfolio, assetRepository.findById((long) 3).orElseThrow(() -> new AssetNotFoundException()), 1, 0, 0));
-    	
     	this.mockMvc.perform(post("/portfolios/")
                 .contentType(contentType)
                 .content(convertToJson(portfolio)))
@@ -112,6 +95,22 @@ public class PortfolioRestControllerTest {
     @Test
     public void getExistingPortfolioLines() throws Exception {
     	this.mockMvc.perform(get("/portfolios/1/lines")).andExpect(status().isOk());
+    }
+    
+    /**
+	 * Check if the application return a HTTP status equal to 201 (Created) if
+	 * a new portfolio line is created in an existing portfolio
+	 */
+    @Test
+    public void savePortfolioLine() throws Exception {
+    	Asset asset = assetRepository.findByIsinCode("FR0000120404")
+    			.orElseThrow(() -> new AssetNotFoundException());
+    	PortfolioLine portfolioLine = new PortfolioLine(portfolio, asset, 5, 10, 1);
+    	    	
+    	this.mockMvc.perform(post("/portfolios/"+portfolio.getId()+"/lines")
+                .contentType(contentType)
+                .content(convertToJson(portfolioLine)))
+                .andExpect(status().isCreated());
     }
     
     /**

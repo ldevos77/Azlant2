@@ -8,6 +8,7 @@ import org.ldevos77.azlant.model.AssetQuote;
 import org.ldevos77.azlant.repository.AssetQuoteRepository;
 import org.ldevos77.azlant.repository.AssetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,7 +16,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Asset controller for Rest API Request
+ * Asset controller for Rest API Requests.
+ * 
+ * Class based on Spring HATEOAS library, used to write hypermedia-driven outputs 
+ * as part of RESTful API. 
  * 
  * @author Ludovic Devos
  */
@@ -25,6 +29,9 @@ public class AssetRestController {
 
 	@Autowired
 	private AssetRepository assetRepository;
+	
+	@Autowired
+	private AssetResourceAssembler assetResourceAssembler;
 	
 	@Autowired
 	private AssetQuoteRepository assetQuoteRepository;
@@ -58,9 +65,13 @@ public class AssetRestController {
 	 * @return Requested asset
 	 */
 	@GetMapping(value = "/{id}")
-	public Asset getAsset(@PathVariable Long id) {
-		return assetRepository.findById(id)
+	public Resource<Asset> getAsset(@PathVariable Long id) {
+
+		Asset asset = assetRepository.findById(id)
 				.orElseThrow(() -> new AssetNotFoundException());
+		
+		return assetResourceAssembler.toResource(asset);
+		
 	}
 	
 	/**
