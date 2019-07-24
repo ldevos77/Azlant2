@@ -61,6 +61,18 @@ public class AssetQuote {
 	 */
 	protected AssetQuote() {}
 	
+	public AssetQuote(Long id, Asset asset, LocalDate quotationDate, float price) {
+		if (id > 0 && asset != null && quotationDate != null && price > 0) {
+			this.id = id;
+			this.asset = asset;
+			this.quotationDate = quotationDate;
+			this.price = price;
+		}
+		else {
+			throw new IllegalArgumentException();
+		}
+	}
+	
 	@PreUpdate
     private void setModificationDate() {
 		this.setModificationDate(LocalDateTime.now());

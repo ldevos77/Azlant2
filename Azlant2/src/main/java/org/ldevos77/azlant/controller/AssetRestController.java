@@ -1,14 +1,11 @@
 package org.ldevos77.azlant.controller;
 
-import java.util.Collections;
-
 import org.ldevos77.azlant.exception.AssetNotFoundException;
 import org.ldevos77.azlant.model.Asset;
 import org.ldevos77.azlant.model.AssetQuote;
 import org.ldevos77.azlant.repository.AssetQuoteRepository;
 import org.ldevos77.azlant.repository.AssetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,9 +28,6 @@ public class AssetRestController {
 	private AssetRepository assetRepository;
 	
 	@Autowired
-	private AssetResourceAssembler assetResourceAssembler;
-	
-	@Autowired
 	private AssetQuoteRepository assetQuoteRepository;
 	
 	/**
@@ -52,10 +46,9 @@ public class AssetRestController {
 	 * @return Asset
 	 */
 	@GetMapping(params="isin")
-	public Iterable<Asset> getAssetByIsinCode(@RequestParam("isin") String isinCode) {
-		Asset asset = assetRepository.findByIsinCode(isinCode)
+	public Asset getAssetByIsinCode(@RequestParam("isin") String isinCode) {
+		return assetRepository.findByIsinCode(isinCode)
 				.orElseThrow(() -> new AssetNotFoundException());
-		return Collections.singletonList(asset);
 	}
 	
 	/**
@@ -65,12 +58,9 @@ public class AssetRestController {
 	 * @return Requested asset
 	 */
 	@GetMapping(value = "/{id}")
-	public Resource<Asset> getAsset(@PathVariable Long id) {
-
-		Asset asset = assetRepository.findById(id)
+	public Asset getAsset(@PathVariable Long id) {
+		return assetRepository.findById(id)
 				.orElseThrow(() -> new AssetNotFoundException());
-		
-		return assetResourceAssembler.toResource(asset);
 		
 	}
 	

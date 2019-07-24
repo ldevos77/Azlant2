@@ -107,6 +107,27 @@ public class Asset {
 	 */
 	protected Asset() {}
 	
+	public Asset(Long id, String name) {
+		if (id > 0 && name != "") {
+			this.id = id;
+			this.name = name;
+		}
+		else {
+			throw new IllegalArgumentException();
+		}
+	}
+	
+	public Asset(Long id, String name, String isinCode) {
+		if (id > 0 && name != "" && isinCode != "") {
+			this.id = id;
+			this.name = name;
+			this.isinCode = isinCode;
+		}
+		else {
+			throw new IllegalArgumentException();
+		}
+	}
+	
 	@PreUpdate
     private void setModificationDate() {
 		this.setModificationDate(LocalDateTime.now());

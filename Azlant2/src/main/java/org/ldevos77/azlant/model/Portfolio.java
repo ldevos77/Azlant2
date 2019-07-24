@@ -13,6 +13,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
@@ -59,12 +60,14 @@ public class Portfolio {
 	 * Creation date is technical field.
 	 * It's update only one time : when the record is created.
 	 */
+	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	private LocalDateTime creationDate;
 	
 	/**
 	 * Modification date is technical field.
 	 * It's updated each time the record is updated.
 	 */
+	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	private LocalDateTime modificationDate;
 	
 	/**
@@ -79,6 +82,22 @@ public class Portfolio {
 	 * @throws IllegalArgumentException if name is empty
 	 */
 	public Portfolio(String name) {
+		if (name != "") {
+			this.name = name;
+		}
+		else {
+			throw new IllegalArgumentException();
+		}
+	}
+	
+	public Portfolio(Long id, String name) {
+		if (id > 0) {
+			this.id = id;
+		}
+		else {
+			throw new IllegalArgumentException();
+		}
+		
 		if (name != "") {
 			this.name = name;
 		}

@@ -1,12 +1,6 @@
 package org.ldevos77.azlant.controller;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
-
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import org.ldevos77.azlant.exception.PortfolioNotFoundException;
 import org.ldevos77.azlant.model.Portfolio;
@@ -14,8 +8,6 @@ import org.ldevos77.azlant.model.PortfolioLine;
 import org.ldevos77.azlant.repository.PortfolioLineRepository;
 import org.ldevos77.azlant.repository.PortfolioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.Resource;
-import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,8 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * Portfolio controller for Rest API Requests.
  * 
- * Class based on Spring HATEOAS library, used to write hypermedia-driven outputs 
- * as part of RESTful API. 
+ * Class based on Spring HATEOAS library, used to write hypermedia-driven 
+ * outputs as part of RESTful API. 
  * 
  * @author Ludovic Devos
  */
@@ -41,9 +33,6 @@ public class PortfolioRestController {
 	private PortfolioRepository portfolioRepository;
 	
 	@Autowired
-	private PortfolioResourceAssembler portfolioResourceAssembler;
-	
-	@Autowired
 	private PortfolioLineRepository portfolioLineRepository;
 	
 	/**
@@ -52,16 +41,8 @@ public class PortfolioRestController {
 	 * @return All portfolios
 	 */
 	@GetMapping
-	public Resources<Resource<Portfolio>> getAllPortfolio() {
-		
-		List<Resource<Portfolio>> portfolios = StreamSupport
-			    .stream(portfolioRepository.findAll().spliterator(), false)
-			.map(portfolioResourceAssembler::toResource)
-			.collect(Collectors.toList());
-		
-		return new Resources<>(portfolios,
-				linkTo(methodOn(PortfolioRestController.class).getAllPortfolio()).withSelfRel());
-		
+	public Iterable<Portfolio> getAllPortfolio() {
+		return portfolioRepository.findAll();
 	}
 	
 	/**
@@ -71,13 +52,9 @@ public class PortfolioRestController {
 	 * @return Requested portfolio
 	 */
 	@GetMapping(value = "/{id}")
-	public Resource<Portfolio> getPortfolio(@PathVariable Long id) {
-		
-		Portfolio portfolio = portfolioRepository.findById(id)
+	public Portfolio getPortfolio(@PathVariable Long id) {
+		return portfolioRepository.findById(id)
 				.orElseThrow(() -> new PortfolioNotFoundException());
-		
-		return portfolioResourceAssembler.toResource(portfolio);
-
 	}
 	
 	/**
@@ -88,12 +65,8 @@ public class PortfolioRestController {
 	 */
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public Resource<Portfolio> addPortfolio(@RequestBody Portfolio portfolio) {
-		
-		Portfolio newPortfolio = portfolioRepository.save(portfolio);
-		
-		return portfolioResourceAssembler.toResource(newPortfolio);
-
+	public Portfolio addPortfolio(@RequestBody Portfolio portfolio) {
+		return portfolioRepository.save(portfolio);
 	}
 	
 	/**
@@ -106,7 +79,8 @@ public class PortfolioRestController {
 	public Iterable<PortfolioLine> getPortfolioLines(@PathVariable Long id) {
 		Optional<Portfolio> portfolio = portfolioRepository.findById(id);
 		if (portfolio.isPresent()) {
-			return portfolioLineRepository.findByPortfolio(portfolio.get());
+			Iterable<PortfolioLine> portfolioLineList = portfolioLineRepository.findByPortfolio(portfolio.get());
+			return portfolioLineList;
 		}
 		else {
 			return null;
