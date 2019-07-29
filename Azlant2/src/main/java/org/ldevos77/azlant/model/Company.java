@@ -26,6 +26,12 @@ public class Company {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private long id;
+
+	/**
+	 * Company Code
+	 * Internal codification (based on mnemo code)
+	 */
+	private String code;
 	
 	private String name;
 	
@@ -46,6 +52,16 @@ public class Company {
 	 * Needed for JPA.
 	 */
 	protected Company() {}
+
+	public Company(String code, String name) {
+		if (code != "" && name != "") {
+			this.code = code;
+			this.name = name;
+		}
+		else {
+			throw new IllegalArgumentException();
+		}
+	}
 	
 	@PreUpdate
     private void setModificationDate() {
@@ -63,8 +79,12 @@ public class Company {
 		return id;
 	}
 
-	public void setId(long id) {
-		this.id = id;
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
 	}
 
 	public String getName() {

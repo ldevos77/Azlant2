@@ -90,22 +90,6 @@ public class Portfolio {
 		}
 	}
 	
-	public Portfolio(Long id, String name) {
-		if (id > 0) {
-			this.id = id;
-		}
-		else {
-			throw new IllegalArgumentException();
-		}
-		
-		if (name != "") {
-			this.name = name;
-		}
-		else {
-			throw new IllegalArgumentException();
-		}
-	}
-	
 	@PreUpdate
     private void setModificationDate() {
 		this.setModificationDate(LocalDateTime.now());
@@ -125,10 +109,6 @@ public class Portfolio {
 
 	public long getId() {
 		return id;
-	}
-
-	public void setId(long id) {
-		this.id = id;
 	}
 
 	public String getName() {

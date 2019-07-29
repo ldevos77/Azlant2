@@ -11,10 +11,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ldevos77.azlant.model.Asset;
+import org.ldevos77.azlant.model.AssetClass;
 import org.ldevos77.azlant.model.AssetQuote;
+import org.ldevos77.azlant.model.Company;
+import org.ldevos77.azlant.model.Country;
+import org.ldevos77.azlant.model.StockExchange;
 import org.ldevos77.azlant.repository.AssetQuoteRepository;
 import org.ldevos77.azlant.repository.AssetRepository;
 import org.ldevos77.azlant.repository.PortfolioLineRepository;
@@ -49,7 +54,20 @@ public class AssetRestControllerTest {
 	
 	@MockBean
 	private PortfolioLineRepository portfolioLineRepository;
-	
+
+    private AssetClass assetClass;
+    private Company company;
+    private Country country;
+    private StockExchange stockExchange;
+
+    @Before
+    public void init() {
+        this.assetClass = new AssetClass("ST","Stock");
+        this.company = new Company("AC","ACCOR");
+        this.country = new Country("FR", "France");
+        this.stockExchange = new StockExchange("XPAR","Euronext Paris", country);
+    }
+
 	/**
 	 * Check if the application return a HHTP status equal to 200 (OK) if
 	 * the list of asset is requested
@@ -57,8 +75,8 @@ public class AssetRestControllerTest {
     @Test
     public void getAllAssets() throws Exception {
     	List<Asset> assetList = new ArrayList<Asset>();
-    	assetList.add(new Asset((long) 1,"Action 1"));
-    	assetList.add(new Asset((long) 2,"Action 2"));
+    	assetList.add(new Asset("FR0000120404", "Stock 1", assetClass, stockExchange, company));
+    	assetList.add(new Asset("FR0000120405", "Stock 2", assetClass, stockExchange, company));
     	
     	Mockito.when(assetRepository.findAll())
 	      .thenReturn(assetList);
@@ -66,7 +84,7 @@ public class AssetRestControllerTest {
         this.mockMvc.perform(get("/assets/"))
           .andExpect(status().isOk())
           .andExpect(jsonPath("$", hasSize(2)))
-          .andExpect(jsonPath("$[0].name", is("Action 1")));
+          .andExpect(jsonPath("$[0].name", is("Stock 1")));
     }
     
     /**
@@ -75,14 +93,14 @@ public class AssetRestControllerTest {
 	 */
     @Test
     public void getExistingAsset() throws Exception {
-    	Asset asset = new Asset((long) 1,"Action 1");
+    	Asset asset = new Asset("FR0000120404", "Stock 1", assetClass, stockExchange, company);
    	 
-	    Mockito.when(assetRepository.findById((long) 1))
+	    Mockito.when(assetRepository.findById(asset.getId()))
 	      .thenReturn(Optional.ofNullable(asset));
     	
-    	this.mockMvc.perform(get("/assets/1"))
+    	this.mockMvc.perform(get("/assets/"+Long.toString(asset.getId())))
     	  .andExpect(status().isOk())
-    	  .andExpect(jsonPath("$.name", is("Action 1")));
+    	  .andExpect(jsonPath("$.name", is("Stock 1")));
     }
     
     /**
@@ -91,10 +109,12 @@ public class AssetRestControllerTest {
 	 */
     @Test
     public void getNonExistingAsset() throws Exception {
-    	Mockito.when(assetRepository.findById((long) 99))
+		long assetId = 99;
+
+    	Mockito.when(assetRepository.findById(assetId))
 	      .thenReturn(Optional.empty());
     	
-    	this.mockMvc.perform(get("/assets/99"))
+    	this.mockMvc.perform(get("/assets/"+Long.toString(assetId)))
     	  .andExpect(status().isNotFound());
     }
     
@@ -104,14 +124,17 @@ public class AssetRestControllerTest {
 	 */
     @Test
     public void getExistingAssetByIsinCode() throws Exception {
-    	Asset asset = new Asset((long) 1, "Action 1", "FR0000120404");
-    	
-	    Mockito.when(assetRepository.findByIsinCode("FR0000120404"))
+		// given
+		Asset asset = new Asset("FR0000120404", "Stock 1", assetClass, stockExchange, company);
+		
+		// when
+	    Mockito.when(assetRepository.findByCode("FR0000120404"))
 	      .thenReturn(Optional.ofNullable(asset));
-    	
-    	this.mockMvc.perform(get("/assets?isin=FR0000120404"))
+		
+		// then
+    	this.mockMvc.perform(get("/assets?code=FR0000120404"))
     	  .andExpect(status().isOk())
-    	  .andExpect(jsonPath("$.name", is("Action 1")));
+    	  .andExpect(jsonPath("$.name", is("Stock 1")));
     }
     
     /**
@@ -120,18 +143,18 @@ public class AssetRestControllerTest {
 	 */
     @Test
     public void getExistingAssetQuotes() throws Exception {
-    	Asset asset = new Asset((long) 1,"Action 1");
+    	Asset asset = new Asset("FR0000120404", "Stock 1", assetClass, stockExchange, company);
     	List<AssetQuote> assetQuoteList = new ArrayList<AssetQuote>();
-    	assetQuoteList.add(new AssetQuote((long) 1, asset, LocalDate.now(), 15));
-    	assetQuoteList.add(new AssetQuote((long) 1, asset, LocalDate.now(), 20));
+    	assetQuoteList.add(new AssetQuote(asset, LocalDate.now(), 15));
+    	assetQuoteList.add(new AssetQuote(asset, LocalDate.now(), 20));
     	
-	    Mockito.when(assetRepository.findById((long) 1))
+	    Mockito.when(assetRepository.findById(asset.getId()))
 	      .thenReturn(Optional.ofNullable(asset));
     	
 	    Mockito.when(assetQuoteRepository.findByAsset(asset))
 	      .thenReturn(assetQuoteList);
     	
-    	this.mockMvc.perform(get("/assets/1/quotes"))
+    	this.mockMvc.perform(get("/assets/"+Long.toString(asset.getId())+"/quotes"))
     	  .andExpect(status().isOk())
     	  .andExpect(jsonPath("$", hasSize(2)))
     	  .andExpect(jsonPath("$[0].price", is(15.0)));

@@ -6,7 +6,7 @@ import java.util.Optional;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.ldevos77.azlant.model.Portfolio;
+import org.ldevos77.azlant.model.Company;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
@@ -15,34 +15,51 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.junit4.SpringRunner;
 
 /**
- * Unit tests for Portfolio repository
+ * Unit tests for Company repository
  * 
  * @author Ludovic Devos
  */
 @RunWith(SpringRunner.class)
 @DataJpaTest
 @AutoConfigureTestDatabase(replace=Replace.NONE)
-public class PortfolioRepositoryTest {
+public class CompanyRepositoryTest {
 	@Autowired
     private TestEntityManager entityManager;
  
     @Autowired
-    private PortfolioRepository portfolioRepository;
+    private CompanyRepository companyRepository;
     
     @Test
-    public void whenFindById_thenReturnPortfolio() {
+    public void whenFindById_thenReturnCompany() {
         // given
-    	Portfolio portfolio = new Portfolio("My portfolio");
-        entityManager.persist(portfolio);
+    	Company company = new Company("MC", "My Companie");
+        entityManager.persist(company);
         entityManager.flush();
      
         // when
-        Optional<Portfolio> found = portfolioRepository.findById(portfolio.getId());
+        Optional<Company> found = companyRepository.findById(company.getId());
      
         // then
         assertThat(found).isNotNull();
         if (found.isPresent()) {
-            assertThat(found.get().getName()).isEqualTo(portfolio.getName());
+            assertThat(found.get().getName()).isEqualTo(company.getName());
+        }
+    }
+
+    @Test
+    public void whenFindByCode_thenReturnCompany() {
+        // given
+    	Company company = new Company("MC", "My Companie");
+        entityManager.persist(company);
+        entityManager.flush();
+     
+        // when
+        Optional<Company> found = companyRepository.findByCode(company.getCode());
+     
+        // then
+        assertThat(found).isNotNull();
+        if (found.isPresent()) {
+            assertThat(found.get().getName()).isEqualTo(company.getName());
         }
     }
 }

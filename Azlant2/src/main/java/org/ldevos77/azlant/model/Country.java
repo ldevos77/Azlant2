@@ -28,6 +28,10 @@ public class Country {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private long id;
 	
+	/**
+	 * Country Code
+	 * ISO 3166
+	 */
 	private String code;
 	
 	private String name;
@@ -49,6 +53,16 @@ public class Country {
 	 * Needed for JPA.
 	 */
 	protected Country() {}
+
+	public Country(String code, String name) {
+		if (code != "" && name != "") {
+			this.code = code;
+			this.name = name;
+		}
+		else {
+			throw new IllegalArgumentException();
+		}
+	}
 	
 	@PreUpdate
     private void setModificationDate() {
@@ -64,10 +78,6 @@ public class Country {
 
 	public long getId() {
 		return id;
-	}
-
-	public void setId(long id) {
-		this.id = id;
 	}
 
 	public String getCode() {

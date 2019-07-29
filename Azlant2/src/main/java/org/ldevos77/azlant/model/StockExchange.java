@@ -29,6 +29,12 @@ public class StockExchange {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private long id;
+
+	/**
+	 * Market Identifier Code (MIC)
+	 * ISO 10383
+	 */
+	private String code;
 	
 	private String name;
 	
@@ -52,6 +58,17 @@ public class StockExchange {
 	 * Private constructor, not for direct instantiation.
 	 */
 	protected StockExchange() {}
+
+	public StockExchange(String code, String name, Country country) {
+		if (code != "" && name != "" && country != null) {
+			this.code = code;
+			this.name = name;
+			this.country = country;
+		}
+		else {
+			throw new IllegalArgumentException();
+		}
+	}
 	
 	@PreUpdate
     private void setModificationDate() {
@@ -69,8 +86,12 @@ public class StockExchange {
 		return id;
 	}
 
-	public void setId(long id) {
-		this.id = id;
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
 	}
 
 	public String getName() {

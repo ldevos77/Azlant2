@@ -43,6 +43,13 @@ public class Asset {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private long id;
+
+	/**
+	 * International Securities Identification Number (ISIN)
+	 * ISO 6166
+	 */
+	@Column(name="code")
+	private String code;
 	
 	/**
 	 * Asset name
@@ -55,12 +62,6 @@ public class Asset {
 	@OneToOne
 	@JoinColumn(name = "asset_class_id")
 	private AssetClass assetClass;
-	
-	/**
-	 * International ISIN Code
-	 */
-	@Column(name="isin_code")
-	private String isinCode;
 	
 	/**
 	 * Stock Exchange where asset is quoted
@@ -107,21 +108,14 @@ public class Asset {
 	 */
 	protected Asset() {}
 	
-	public Asset(Long id, String name) {
-		if (id > 0 && name != "") {
-			this.id = id;
+	public Asset(String code, String name,  
+		AssetClass assetClass, StockExchange stockExchange, Company company) {
+		if (code != "" && name != "" && assetClass != null && stockExchange != null && company != null) {
+			this.code = code;
 			this.name = name;
-		}
-		else {
-			throw new IllegalArgumentException();
-		}
-	}
-	
-	public Asset(Long id, String name, String isinCode) {
-		if (id > 0 && name != "" && isinCode != "") {
-			this.id = id;
-			this.name = name;
-			this.isinCode = isinCode;
+			this.assetClass = assetClass;
+			this.stockExchange = stockExchange;
+			this.company = company;
 		}
 		else {
 			throw new IllegalArgumentException();
@@ -144,24 +138,20 @@ public class Asset {
 		return id;
 	}
 
-	public void setId(long id) {
-		this.id = id;
+	public String getCode() {
+		return code;
 	}
 
+	public void setCode(String code) {
+		this.code = code;
+	}
+	
 	public String getName() {
 		return name;
 	}
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public String getIsinCode() {
-		return isinCode;
-	}
-
-	public void setIsinCode(String isinCode) {
-		this.isinCode = isinCode;
 	}
 
 	public AssetClass getAssetClass() {

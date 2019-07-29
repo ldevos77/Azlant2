@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class PortfolioLineNotFoundException extends RuntimeException {
 
 	/**
-	 * generated serial version ID (compiler-generated ID)
+	 * Serial version ID set manually
 	 */
-	private static final long serialVersionUID = 4362926615449121787L;
+	private static final long serialVersionUID = 1L;
 
 }

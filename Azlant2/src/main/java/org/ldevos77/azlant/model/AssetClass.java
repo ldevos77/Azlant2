@@ -12,12 +12,6 @@ import javax.persistence.PreUpdate;
 /**
  * Asset
  * 
- * -------------------------
- * Asset
- * -------------------------
- * String name
- * -------------------------
- * 
  * @author Ludovic Devos
  */
 @Entity
@@ -26,6 +20,12 @@ public class AssetClass {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private long id;
+
+	/**
+	 * Asset Class Code
+	 * Internal codification
+	 */
+	private String code;
 	
 	private String name;
 	
@@ -46,6 +46,16 @@ public class AssetClass {
 	 * Needed for JPA.
 	 */
 	protected AssetClass() {}
+
+	public AssetClass(String code, String name) {
+		if (code != "" && name != "") {
+			this.code = code;
+			this.name = name;
+		}
+		else {
+			throw new IllegalArgumentException();
+		}
+	}
 	
 	@PreUpdate
     private void setModificationDate() {
@@ -63,8 +73,12 @@ public class AssetClass {
 		return id;
 	}
 
-	public void setId(long id) {
-		this.id = id;
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
 	}
 
 	public String getName() {

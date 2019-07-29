@@ -61,9 +61,8 @@ public class AssetQuote {
 	 */
 	protected AssetQuote() {}
 	
-	public AssetQuote(Long id, Asset asset, LocalDate quotationDate, float price) {
-		if (id > 0 && asset != null && quotationDate != null && price > 0) {
-			this.id = id;
+	public AssetQuote(Asset asset, LocalDate quotationDate, float price) {
+		if (asset != null && quotationDate != null && price > 0) {
 			this.asset = asset;
 			this.quotationDate = quotationDate;
 			this.price = price;
@@ -87,10 +86,6 @@ public class AssetQuote {
 
 	public long getId() {
 		return id;
-	}
-
-	public void setId(long id) {
-		this.id = id;
 	}
 
 	public float getPrice() {

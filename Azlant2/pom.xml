@@ -5,7 +5,7 @@
 
 	<groupId>org.ldevos77</groupId>
 	<artifactId>azlant</artifactId>
-	<version>0.1.0-SNAPSHOT</version>
+	<version>0.1.1-SNAPSHOT</version>
 
 	<name>Azlant2</name>
 	<description>Project for financial portfolio</description>
@@ -37,6 +37,11 @@
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>test</scope>
 		</dependency>
 		
 		<dependency>

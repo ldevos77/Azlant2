@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class AssetNotFoundException extends RuntimeException {
 
 	/**
-	 * generated serial version ID (compiler-generated ID)
+	 * Serial version ID set manually
 	 */
-	private static final long serialVersionUID = -7200373810463384336L;
+	private static final long serialVersionUID = 1L;
 
 }

@@ -41,13 +41,13 @@ public class AssetRestController {
 	}
 	
 	/**
-	 * Get assets by ISIN Code
+	 * Get assets by code
 	 * 
 	 * @return Asset
 	 */
-	@GetMapping(params="isin")
-	public Asset getAssetByIsinCode(@RequestParam("isin") String isinCode) {
-		return assetRepository.findByIsinCode(isinCode)
+	@GetMapping(params="code")
+	public Asset getAssetByIsinCode(@RequestParam("code") String code) {
+		return assetRepository.findByCode(code)
 				.orElseThrow(() -> new AssetNotFoundException());
 	}
 	

@@ -99,23 +99,6 @@ public class PortfolioLine {
 		
 	}
 	
-	public PortfolioLine(Long id, Portfolio portfolio, Asset asset, int quantity, 
-			float purchasePrice, float tradingFees) {
-		
-		if (id > 0 && portfolio != null && asset != null && quantity > 0 && purchasePrice >= 0 && tradingFees >=0) {
-			this.id = id;
-			this.portfolio = portfolio;
-			this.asset = asset;
-			this.quantity = quantity;
-			this.purchasePrice = purchasePrice;
-			this.tradingFees = tradingFees;
-		}
-		else {
-			throw new IllegalArgumentException();
-		}
-		
-	}
-	
 	@PreUpdate
     private void setModificationDate() {
 		this.setModificationDate(LocalDateTime.now());
@@ -130,10 +113,6 @@ public class PortfolioLine {
 
 	public long getId() {
 		return id;
-	}
-
-	public void setId(long id) {
-		this.id = id;
 	}
 
 	public int getQuantity() {

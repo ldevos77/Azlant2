@@ -6,7 +6,7 @@ import java.util.Optional;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.ldevos77.azlant.model.Portfolio;
+import org.ldevos77.azlant.model.Country;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
@@ -15,34 +15,51 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.junit4.SpringRunner;
 
 /**
- * Unit tests for Portfolio repository
+ * Unit tests for Country repository
  * 
  * @author Ludovic Devos
  */
 @RunWith(SpringRunner.class)
 @DataJpaTest
 @AutoConfigureTestDatabase(replace=Replace.NONE)
-public class PortfolioRepositoryTest {
+public class CountryRepositoryTest {
 	@Autowired
     private TestEntityManager entityManager;
  
     @Autowired
-    private PortfolioRepository portfolioRepository;
+    private CountryRepository countryRepository;
     
     @Test
-    public void whenFindById_thenReturnPortfolio() {
+    public void whenFindById_thenReturnCountry() {
         // given
-    	Portfolio portfolio = new Portfolio("My portfolio");
-        entityManager.persist(portfolio);
+    	Country country = new Country("MC", "My Companie");
+        entityManager.persist(country);
         entityManager.flush();
      
         // when
-        Optional<Portfolio> found = portfolioRepository.findById(portfolio.getId());
+        Optional<Country> found = countryRepository.findById(country.getId());
      
         // then
         assertThat(found).isNotNull();
         if (found.isPresent()) {
-            assertThat(found.get().getName()).isEqualTo(portfolio.getName());
+            assertThat(found.get().getName()).isEqualTo(country.getName());
+        }
+    }
+
+    @Test
+    public void whenFindByCode_thenReturnCountry() {
+        // given
+    	Country country = new Country("MC", "My Companie");
+        entityManager.persist(country);
+        entityManager.flush();
+     
+        // when
+        Optional<Country> found = countryRepository.findByCode(country.getCode());
+     
+        // then
+        assertThat(found).isNotNull();
+        if (found.isPresent()) {
+            assertThat(found.get().getName()).isEqualTo(country.getName());
         }
     }
 }
