@@ -12,12 +12,6 @@ import javax.persistence.PreUpdate;
 /**
  * Company
  * 
- * -------------------------
- * Company
- * -------------------------
- * String name
- * -------------------------
- * 
  * @author Ludovic Devos
  */
 @Entity
@@ -111,4 +105,10 @@ public class Company {
 		this.modificationDate = modificationDate;
 	}
 	
+	@Override
+    public String toString() {
+        return String.format(
+                "Company[id=%d, code='%s', name='%s']",
+                id, code, name);
+    }
 }

@@ -5,7 +5,10 @@ import org.ldevos77.azlant.model.Asset;
 import org.ldevos77.azlant.model.AssetQuote;
 import org.ldevos77.azlant.repository.AssetQuoteRepository;
 import org.ldevos77.azlant.repository.AssetRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,14 +18,14 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * Asset controller for Rest API Requests.
  * 
- * Class based on Spring HATEOAS library, used to write hypermedia-driven outputs 
- * as part of RESTful API. 
- * 
  * @author Ludovic Devos
  */
+@CrossOrigin
 @RestController
 @RequestMapping(path="/assets")
 public class AssetRestController {
+
+	Logger logger = LoggerFactory.getLogger(AssetRestController.class);
 
 	@Autowired
 	private AssetRepository assetRepository;
@@ -47,6 +50,7 @@ public class AssetRestController {
 	 */
 	@GetMapping(params="code")
 	public Asset getAssetByIsinCode(@RequestParam("code") String code) {
+		logger.debug("AssetRestController.getAssetByIsinCode(code=)");
 		return assetRepository.findByCode(code)
 				.orElseThrow(() -> new AssetNotFoundException());
 	}
@@ -59,9 +63,10 @@ public class AssetRestController {
 	 */
 	@GetMapping(value = "/{id}")
 	public Asset getAsset(@PathVariable Long id) {
-		return assetRepository.findById(id)
-				.orElseThrow(() -> new AssetNotFoundException());
+		Asset asset = assetRepository.findById(id)
+					.orElseThrow(() -> new AssetNotFoundException());
 		
+		return asset;
 	}
 	
 	/**
@@ -73,7 +78,8 @@ public class AssetRestController {
 	@GetMapping(value = "/{id}/quotes")
 	public Iterable<AssetQuote> getAssetQuotes(@PathVariable Long id) {
 		Asset asset = assetRepository.findById(id)
-				.orElseThrow(() -> new AssetNotFoundException());
+					.orElseThrow(() -> new AssetNotFoundException());
 		return assetQuoteRepository.findByAsset(asset);
 	}
+
 }

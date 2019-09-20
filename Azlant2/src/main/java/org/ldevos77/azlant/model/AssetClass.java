@@ -10,7 +10,7 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 
 /**
- * Asset
+ * Asset class
  * 
  * @author Ludovic Devos
  */
@@ -104,4 +104,11 @@ public class AssetClass {
 	public void setModificationDate(LocalDateTime modificationDate) {
 		this.modificationDate = modificationDate;
 	}
+
+	@Override
+    public String toString() {
+        return String.format(
+                "AssetClass[id=%d, code='%s', name='%s']",
+                id, code, name);
+    }
 }

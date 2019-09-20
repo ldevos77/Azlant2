@@ -20,6 +20,7 @@ import org.ldevos77.azlant.model.AssetQuote;
 import org.ldevos77.azlant.model.Company;
 import org.ldevos77.azlant.model.Country;
 import org.ldevos77.azlant.model.StockExchange;
+import org.ldevos77.azlant.model.TradingDay;
 import org.ldevos77.azlant.repository.AssetQuoteRepository;
 import org.ldevos77.azlant.repository.AssetRepository;
 import org.ldevos77.azlant.repository.PortfolioLineRepository;
@@ -73,7 +74,7 @@ public class AssetRestControllerTest {
 	 * the list of asset is requested
 	 */
     @Test
-    public void getAllAssets() throws Exception {
+    public void whenGetAllAsset_thenReturnAssetList() throws Exception {
     	List<Asset> assetList = new ArrayList<Asset>();
     	assetList.add(new Asset("FR0000120404", "Stock 1", assetClass, stockExchange, company));
     	assetList.add(new Asset("FR0000120405", "Stock 2", assetClass, stockExchange, company));
@@ -92,7 +93,7 @@ public class AssetRestControllerTest {
 	 * an existing asset ID is requested 
 	 */
     @Test
-    public void getExistingAsset() throws Exception {
+    public void whenGetAsset_thenReturnAsset() throws Exception {
     	Asset asset = new Asset("FR0000120404", "Stock 1", assetClass, stockExchange, company);
    	 
 	    Mockito.when(assetRepository.findById(asset.getId()))
@@ -108,7 +109,7 @@ public class AssetRestControllerTest {
 	 * an non existing asset ID is requested
 	 */
     @Test
-    public void getNonExistingAsset() throws Exception {
+    public void whenGetNonExistingAsset_thenReturnNotFoundStatus() throws Exception {
 		long assetId = 99;
 
     	Mockito.when(assetRepository.findById(assetId))
@@ -120,10 +121,10 @@ public class AssetRestControllerTest {
     
     /**
 	 * Check if the application return a HHTP status equal to 200 (OK) if
-	 * an existing asset is requested using its Isin Code 
+	 * an existing asset is requested using its code 
 	 */
     @Test
-    public void getExistingAssetByIsinCode() throws Exception {
+    public void whenGetAssetByCode_thenReturnAsset() throws Exception {
 		// given
 		Asset asset = new Asset("FR0000120404", "Stock 1", assetClass, stockExchange, company);
 		
@@ -142,11 +143,13 @@ public class AssetRestControllerTest {
 	 * quotes are requested for an existing asset
 	 */
     @Test
-    public void getExistingAssetQuotes() throws Exception {
-    	Asset asset = new Asset("FR0000120404", "Stock 1", assetClass, stockExchange, company);
+    public void whenGetAssetQuotes_thenReturnAssetQuotesList() throws Exception {
+		Asset asset = new Asset("FR0000120404", "Stock 1", assetClass, stockExchange, company);
+		TradingDay tradingDay1 = new TradingDay(stockExchange, LocalDate.now().minusDays(1));
+		TradingDay tradingDay2 = new TradingDay(stockExchange, LocalDate.now().minusDays(2));
     	List<AssetQuote> assetQuoteList = new ArrayList<AssetQuote>();
-    	assetQuoteList.add(new AssetQuote(asset, LocalDate.now(), 15));
-    	assetQuoteList.add(new AssetQuote(asset, LocalDate.now(), 20));
+    	assetQuoteList.add(new AssetQuote(asset, tradingDay2, 15));
+    	assetQuoteList.add(new AssetQuote(asset, tradingDay1, 20));
     	
 	    Mockito.when(assetRepository.findById(asset.getId()))
 	      .thenReturn(Optional.ofNullable(asset));
@@ -158,6 +161,6 @@ public class AssetRestControllerTest {
     	  .andExpect(status().isOk())
     	  .andExpect(jsonPath("$", hasSize(2)))
     	  .andExpect(jsonPath("$[0].price", is(15.0)));
-    }
+	}
     
 }

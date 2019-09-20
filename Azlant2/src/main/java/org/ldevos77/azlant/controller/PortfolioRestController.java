@@ -9,6 +9,8 @@ import org.ldevos77.azlant.repository.PortfolioLineRepository;
 import org.ldevos77.azlant.repository.PortfolioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,11 +22,9 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * Portfolio controller for Rest API Requests.
  * 
- * Class based on Spring HATEOAS library, used to write hypermedia-driven 
- * outputs as part of RESTful API. 
- * 
  * @author Ludovic Devos
  */
+@CrossOrigin
 @RestController
 @RequestMapping(path="/portfolios")
 public class PortfolioRestController {
@@ -98,5 +98,38 @@ public class PortfolioRestController {
 	public PortfolioLine addPortfolioLine(@RequestBody PortfolioLine portfolioLine) {
 		return portfolioLineRepository.save(portfolioLine);
 	}
-	
+
+	/**
+	 * Delete a specific portfolio based on its ID
+	 * 
+	 * @param id : portfolio ID
+	 */
+	@DeleteMapping("/{id}")
+	@ResponseStatus(HttpStatus.OK)
+	public void deletePortfolio(@PathVariable long id) {
+		Optional<Portfolio> portfolio = portfolioRepository.findById(id);
+		if (portfolio.isPresent()) {
+			portfolioLineRepository.deleteByPortfolio(portfolio.get());
+			portfolioRepository.deleteById(id);
+		}
+		else 
+			throw(new PortfolioNotFoundException());
+	}
+
+	/**
+	 * Delete a specific portfolio line based on its ID
+	 * 
+	 * @param id : portfolio line ID
+	 */
+	@DeleteMapping("/{portfolioId}/lines/{lineId}")
+	@ResponseStatus(HttpStatus.OK)
+	public void deletePortfolioLine(@PathVariable long portfolioId, @PathVariable long lineId) {
+		Optional<Portfolio> portfolio = portfolioRepository.findById(portfolioId);
+		if (portfolio.isPresent()) {
+			portfolioLineRepository.deleteById(lineId);
+		}
+		else 
+			throw(new PortfolioNotFoundException());
+	}
+
 }

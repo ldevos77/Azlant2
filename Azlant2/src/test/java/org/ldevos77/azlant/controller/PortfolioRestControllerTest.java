@@ -2,6 +2,7 @@ package org.ldevos77.azlant.controller;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -85,7 +86,7 @@ public class PortfolioRestControllerTest {
 	 * the list of portfolio is requested
 	 */
     @Test
-    public void getAllPortfolios() throws Exception {
+    public void whenGetAllPortfolio_thenReturnPortfolioList() throws Exception {
     	List<Portfolio> portfolioList = new ArrayList<Portfolio>();
     	portfolioList.add(new Portfolio("My portfolio 1"));
     	portfolioList.add(new Portfolio("My portfolio 2"));
@@ -104,7 +105,7 @@ public class PortfolioRestControllerTest {
 	 * an existing portfolio ID is requested 
 	 */
     @Test
-    public void getExistingPortfolio() throws Exception {
+    public void whenGetPortfolio_thenReturnPortfolio() throws Exception {
     	Portfolio portfolio = new Portfolio("My portfolio 1");
 	 
 	    Mockito.when(portfolioRepository.findById(portfolio.getId()))
@@ -120,7 +121,7 @@ public class PortfolioRestControllerTest {
 	 * an non existing portfolio ID is requested
 	 */
     @Test
-    public void getNonExistingPortfolio() throws Exception {
+    public void whenGetNonExistingPortfolio_thenReturnNotFoundStatus() throws Exception {
 		long portfolioId = 99;
 
 	    Mockito.when(portfolioRepository.findById(portfolioId))
@@ -135,7 +136,7 @@ public class PortfolioRestControllerTest {
 	 * a new empty portfolio is created
 	 */
     @Test
-    public void saveNonExistingEmptyPortfolio() throws Exception {
+    public void whenAddPortfolio_thenReturnSavedPortfolio() throws Exception {
 		Portfolio portfolio = new Portfolio("My portfolio 1");
    	 
 	    Mockito.when(portfolioRepository.save(Mockito.any(Portfolio.class)))
@@ -153,7 +154,7 @@ public class PortfolioRestControllerTest {
 	 * lines are requested for an existing portfolio
 	 */
     @Test
-    public void getExistingPortfolioLines() throws Exception {
+    public void whenGetPortfolioLines_thenReturnPortfolioLines() throws Exception {
 		Portfolio portfolio = new Portfolio("My portfolio");
 		Asset asset = new Asset("Stock 1", "FR0000120404", assetClass, stockExchange, company);
     	List<PortfolioLine> portfolioLineList = new ArrayList<PortfolioLine>();
@@ -177,7 +178,7 @@ public class PortfolioRestControllerTest {
 	 * a new portfolio line is created in an existing portfolio
 	 */
     @Test
-    public void savePortfolioLine() throws Exception {
+    public void whenAddPortfolioLine_thenReturnSavedPortfolioLine() throws Exception {
     	Portfolio portfolio = new Portfolio("My portfolio");
 	    Asset asset = new Asset("Stock 1", "FR0000120404", assetClass, stockExchange, company);
     	PortfolioLine portfolioLine = new PortfolioLine(portfolio, asset, 5, 10, 1);
@@ -190,7 +191,47 @@ public class PortfolioRestControllerTest {
                 .content(convertToJson(portfolioLine)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.quantity", is(5)));
-    }
+	}
+	
+	/**
+	 * Check if the application return a HTTP status equal to 200 (OK) if
+	 * a portfolio is deleted successfully
+	 */
+    @Test
+    public void whenDeletePortfolio_thenReturnOkStatus() throws Exception {
+		Portfolio portfolio = new Portfolio("My portfolio");
+		
+		Mockito.when(portfolioRepository.findById(portfolio.getId()))
+	      .thenReturn(Optional.ofNullable(portfolio));
+		Mockito.doNothing().when(portfolioRepository).deleteById(portfolio.getId());
+		Mockito.doNothing().when(portfolioLineRepository).deleteByPortfolio(portfolio);;
+    	
+    	this.mockMvc.perform(delete("/portfolios/"+Long.toString(portfolio.getId()))
+                .contentType(contentType)
+                .content(convertToJson(portfolio)))
+                .andExpect(status().isOk());
+	}
+	
+	/**
+	 * Check if the application return a HTTP status equal to 200 (OK) if
+	 * a portfolio line is deleted successfully
+	 */
+    @Test
+    public void whenDeletePortfolioLine_thenReturnOkStatus() throws Exception {
+		Portfolio portfolio = new Portfolio("My portfolio");
+	    Asset asset = new Asset("Stock 1", "FR0000120404", assetClass, stockExchange, company);
+    	PortfolioLine portfolioLine = new PortfolioLine(portfolio, asset, 5, 10, 1);
+		
+		Mockito.when(portfolioRepository.findById(portfolio.getId()))
+	      .thenReturn(Optional.ofNullable(portfolio));
+		Mockito.doNothing().when(portfolioLineRepository).deleteById(portfolioLine.getId());
+    	
+		this.mockMvc.perform(delete("/portfolios/"+Long.toString(portfolio.getId())
+									+"/lines/"+portfolioLine.getId())
+                .contentType(contentType)
+                .content(convertToJson(portfolioLine)))
+                .andExpect(status().isOk());
+	}
     
     /**
 	 * Convert Object to JSON String

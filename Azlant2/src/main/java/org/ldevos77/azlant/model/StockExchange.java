@@ -14,13 +14,6 @@ import javax.persistence.PreUpdate;
 /**
  * Stock exchange
  * 
- * -------------------------
- * StockExchange
- * -------------------------
- * String name
- * Country country
- * -------------------------
- * 
  * @author Ludovic Devos
  */
 @Entity
@@ -125,4 +118,11 @@ public class StockExchange {
 	public void setModificationDate(LocalDateTime modificationDate) {
 		this.modificationDate = modificationDate;
 	}
+
+	@Override
+    public String toString() {
+        return String.format(
+                "StockExchange[id=%d, code='%s', name='%s']",
+                id, code, name);
+    }
 }

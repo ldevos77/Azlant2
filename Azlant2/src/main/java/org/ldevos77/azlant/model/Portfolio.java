@@ -1,30 +1,18 @@
 package org.ldevos77.azlant.model;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * Portfolio
- * 
- * -------------------------
- * Portfolio
- * -------------------------
- * String name
- * List<PortfolioLine> lines
- * -------------------------
  * 
  * @author Ludovic Devos
  */
@@ -42,19 +30,6 @@ public class Portfolio {
 	 * Portfolio name
 	 */
 	private String name;
-	
-	/**
-	 * Portfolio lines
-	 * 
-	 * BEST PRACTICE
-	 * Whenever a bidirectional association is formed, the application developer must make sure both sides are 
-	 * in-sync at all times. 
-	 * The addLine() and removeLine() are utilities methods that synchronize both ends whenever a child element 
-	 * is added or removed.
-	 */
-	@OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
-	@JsonIgnore
-	private List<PortfolioLine> lines = new ArrayList<>();
 	
 	/**
 	 * Creation date is technical field.
@@ -101,11 +76,6 @@ public class Portfolio {
     	this.setCreationDate(localDateTime);
     	this.setModificationDate(localDateTime);
 	}
-	
-	@Override
-	public String toString() {
-		return "Portfolio [id=" + id + ", name=" + name + "]";
-	}
 
 	public long getId() {
 		return id;
@@ -118,24 +88,6 @@ public class Portfolio {
 	public void setName(String name) {
 		this.name = name;
 	}
-
-	public List<PortfolioLine> getLines() {
-		return lines;
-	}
-	
-	public void setLines(List<PortfolioLine> lines) {
-		this.lines = lines;
-	}
-	
-    public void addLine(PortfolioLine line) {
-    	lines.add(line);
-        line.setPortfolio( this );
-    }
-
-    public void removeLine(PortfolioLine line) {
-    	lines.remove(line);
-        line.setPortfolio( null );
-    }
 
 	public LocalDateTime getCreationDate() {
 		return creationDate;
@@ -153,5 +105,11 @@ public class Portfolio {
 		this.modificationDate = modificationDate;
 	}
 
+	@Override
+    public String toString() {
+        return String.format(
+                "Portfolio[id=%d, name='%s']",
+                id, name);
+    }
 }
 

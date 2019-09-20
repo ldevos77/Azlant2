@@ -11,14 +11,7 @@ import javax.persistence.PreUpdate;
 
 /**
  * Country
- * 
- * -------------------------
- * Country
- * -------------------------
- * String code
- * String name
- * -------------------------
- * 
+  * 
  * @author Ludovic Devos
  */
 @Entity
@@ -111,4 +104,11 @@ public class Country {
 	public void setModificationDate(LocalDateTime modificationDate) {
 		this.modificationDate = modificationDate;
 	}
+
+	@Override
+    public String toString() {
+        return String.format(
+                "Country[id=%d, code='%s', name='%s']",
+                id, code, name);
+    }
 }

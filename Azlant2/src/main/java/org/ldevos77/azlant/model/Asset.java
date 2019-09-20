@@ -1,36 +1,18 @@
 package org.ldevos77.azlant.model;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 /**
  * Asset
- * 
- * -------------------------
- * Asset
- * -------------------------
- * String name
- * AssetClass assetClass
- * String isinCode
- * StockExchange stockExchange
- * Company company
- * List<AssetQuote> quotes
- * -------------------------
  * 
  * @author Ludovic Devos
  */
@@ -48,7 +30,6 @@ public class Asset {
 	 * International Securities Identification Number (ISIN)
 	 * ISO 6166
 	 */
-	@Column(name="code")
 	private String code;
 	
 	/**
@@ -77,19 +58,6 @@ public class Asset {
 	@JoinColumn(name = "company_id")
 	private Company company;
 	
-	/**
-	 * Quotation list
-	 * 
-	 * BEST PRACTICE
-	 * Whenever a bidirectional association is formed, the application developer must make sure both sides are 
-	 * in-sync at all times. 
-	 * The addQuote() and removeQuote() are utilities methods that synchronize both ends whenever a child element 
-	 * is added or removed.
-	*/
-	@OneToMany(mappedBy = "asset", cascade = CascadeType.REMOVE, orphanRemoval = true)
-	@JsonIgnore
-	private List<AssetQuote> quotes = new ArrayList<>();
-
 	/**
 	 * Creation date is technical field.
 	 * It's update only one time : when the record is created.
@@ -178,16 +146,6 @@ public class Asset {
 		this.company = company;
 	}
 	
-    public void addQuote(AssetQuote quote) {
-    	quotes.add(quote);
-    	quote.setAsset( this );
-    }
-
-    public void removeQuote(AssetQuote quote) {
-    	quotes.remove(quote);
-    	quote.setAsset( null );
-    }
-
 	public LocalDateTime getCreationDate() {
 		return creationDate;
 	}
@@ -204,12 +162,11 @@ public class Asset {
 		this.modificationDate = modificationDate;
 	}
 
-	public List<AssetQuote> getQuotes() {
-		return quotes;
-	}
-
-	public void setQuotes(List<AssetQuote> quotes) {
-		this.quotes = quotes;
-	}
+	@Override
+    public String toString() {
+        return String.format(
+                "Asset[id=%d, code='%s', name='%s']",
+                id, code, name);
+    }
 
 }

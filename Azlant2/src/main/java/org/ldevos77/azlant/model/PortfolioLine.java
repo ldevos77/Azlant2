@@ -13,20 +13,8 @@ import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 /**
  * Line of financial portfolio.
- * 
- * ---------------
- * PortfolioLine
- * ---------------
- * portfolio
- * asset
- * quantity
- * purchasePrice
- * tradingFees
- * ---------------
  * 
  * @author Ludovic Devos
  */
@@ -39,7 +27,6 @@ public class PortfolioLine {
 	
 	@ManyToOne
 	@JoinColumn(name = "portfolio_id")
-	@JsonIgnore
 	private Portfolio portfolio;
 	
 	@OneToOne
@@ -171,4 +158,10 @@ public class PortfolioLine {
 		this.modificationDate = modificationDate;
 	}
 
+	@Override
+    public String toString() {
+        return String.format(
+                "PortfolioLine[portfolioName='%s', id=%d, assetCode='%s', quantity=%d, purchasePrice=%d]",
+                portfolio.getName(),id, asset.getCode(), quantity, purchasePrice);
+    }
 }

@@ -66,7 +66,7 @@ public class PortfolioLineRepositoryTest {
     }
 
     @Test
-    public void whenFindByPortfolio_thenReturnPortfolioLine() {
+    public void whenFindByPortfolio_thenReturnPortfolioLines() {
         // given
         Company company = new Company("MC", "My Company");
         entityManager.persist(company);
@@ -91,5 +91,86 @@ public class PortfolioLineRepositoryTest {
         assertThat(found).isNotNull();
         assertThat(StreamSupport.stream(found.spliterator(), false).count()).isEqualTo(1);
         assertThat(found.iterator().next().getPurchasePrice()).isEqualTo(portfolioLine.getPurchasePrice());
+    }
+
+    @Test
+    public void whenSave_thenSavePortfolioLine() {
+        // given
+        Company company = new Company("MC", "My Company");
+        entityManager.persist(company);
+        Country country = new Country("MC", "My Country");
+        entityManager.persist(country);
+        StockExchange stockExchange = new StockExchange("MSE", "My Stock Exchange", country);
+        entityManager.persist(stockExchange);
+        AssetClass assetClass = new AssetClass("AC", "My Asset Class");
+        entityManager.persist(assetClass);
+        Asset asset = new Asset("FR00000000000", "My stock", assetClass, stockExchange, company);
+        entityManager.persist(asset);
+        Portfolio portfolio = new Portfolio("My portfolio");
+        entityManager.persist(portfolio);
+        entityManager.flush();
+
+        PortfolioLine portfolioLine = new PortfolioLine(portfolio, asset, 5, 100, 2);
+    
+        // when
+        PortfolioLine savedPortfolioLine = portfolioLineRepository.save(portfolioLine);
+     
+        // then
+        assertThat(entityManager.find(PortfolioLine.class, savedPortfolioLine.getId()))
+            .isNotNull();
+        assertThat(entityManager.find(PortfolioLine.class, savedPortfolioLine.getId()).getQuantity())
+            .isEqualTo(portfolioLine.getQuantity());
+    }
+
+    @Test
+    public void whenDeleteById_thenDeletePortfolioLine() {
+        // given
+        Company company = new Company("MC", "My Company");
+        entityManager.persist(company);
+        Country country = new Country("MC", "My Country");
+        entityManager.persist(country);
+        StockExchange stockExchange = new StockExchange("MSE", "My Stock Exchange", country);
+        entityManager.persist(stockExchange);
+        AssetClass assetClass = new AssetClass("AC", "My Asset Class");
+        entityManager.persist(assetClass);
+        Asset asset = new Asset("FR00000000000", "My stock", assetClass, stockExchange, company);
+        entityManager.persist(asset);
+        Portfolio portfolio = new Portfolio("My portfolio");
+        entityManager.persist(portfolio);
+        PortfolioLine portfolioLine = new PortfolioLine(portfolio, asset, 5, 100, 2);
+        entityManager.persist(portfolioLine);
+        entityManager.flush();
+     
+        // when
+        portfolioLineRepository.deleteById(portfolioLine.getId());
+     
+        // then
+        assertThat(entityManager.find(PortfolioLine.class, portfolioLine.getId())).isNull();
+    }
+
+    @Test
+    public void whenDeleteByPortfolio_thenDeletePortfolioLines() {
+        // given
+        Company company = new Company("MC", "My Company");
+        entityManager.persist(company);
+        Country country = new Country("MC", "My Country");
+        entityManager.persist(country);
+        StockExchange stockExchange = new StockExchange("MSE", "My Stock Exchange", country);
+        entityManager.persist(stockExchange);
+        AssetClass assetClass = new AssetClass("AC", "My Asset Class");
+        entityManager.persist(assetClass);
+        Asset asset = new Asset("FR00000000000", "My stock", assetClass, stockExchange, company);
+        entityManager.persist(asset);
+        Portfolio portfolio = new Portfolio("My portfolio");
+        entityManager.persist(portfolio);
+        PortfolioLine portfolioLine = new PortfolioLine(portfolio, asset, 5, 100, 2);
+        entityManager.persist(portfolioLine);
+        entityManager.flush();
+     
+        // when
+        portfolioLineRepository.deleteByPortfolio(portfolio);
+     
+        // then
+        assertThat(entityManager.find(PortfolioLine.class, portfolioLine.getId())).isNull();
     }
 }

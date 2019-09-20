@@ -1,6 +1,5 @@
 package org.ldevos77.azlant.model;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import javax.persistence.Entity;
@@ -12,18 +11,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 /**
  * Asset quote
- * 
- * -------------------------
- * AssetQuote
- * -------------------------
- * Asset asset
- * LocalDate quotationDate
- * float price
- * -------------------------
  * 
  * @author Ludovic Devos
  */
@@ -36,10 +25,11 @@ public class AssetQuote {
 
 	@ManyToOne
 	@JoinColumn(name = "asset_id")
-	@JsonIgnore
 	private Asset asset;
 	
-	private LocalDate quotationDate;
+	@ManyToOne
+	@JoinColumn(name = "trading_day_id")
+	private TradingDay tradingDay;
 	
 	private float price;
 	
@@ -61,10 +51,10 @@ public class AssetQuote {
 	 */
 	protected AssetQuote() {}
 	
-	public AssetQuote(Asset asset, LocalDate quotationDate, float price) {
-		if (asset != null && quotationDate != null && price > 0) {
+	public AssetQuote(Asset asset, TradingDay tradingDay, float price) {
+		if (asset != null && tradingDay != null && price > 0) {
 			this.asset = asset;
-			this.quotationDate = quotationDate;
+			this.tradingDay = tradingDay;
 			this.price = price;
 		}
 		else {
@@ -104,12 +94,12 @@ public class AssetQuote {
 		this.asset = asset;
 	}
 
-	public java.time.LocalDate getQuotationDate() {
-		return quotationDate;
+	public TradingDay getTradingDay() {
+		return tradingDay;
 	}
 
-	public void setQuotationDate(java.time.LocalDate quotationDate) {
-		this.quotationDate = quotationDate;
+	public void setTradingDay(TradingDay tradingDay) {
+		this.tradingDay = tradingDay;
 	}
 
 	public LocalDateTime getCreationDate() {
@@ -127,4 +117,11 @@ public class AssetQuote {
 	public void setModificationDate(LocalDateTime modificationDate) {
 		this.modificationDate = modificationDate;
 	}
+
+	@Override
+    public String toString() {
+        return String.format(
+                "AssetQuote[assetCode='%s', id=%d, tradingDay='%s', price=%d]",
+                asset.getCode(), id, tradingDay.getDate().toString(), price);
+    }
 }
